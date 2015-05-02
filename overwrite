@@ -1,0 +1,18 @@
+case $# in
+0|1) echo 'Usage overwite file cmd [args]' 1>&2 ; exit 2
+esac
+
+file=$1; shift
+new=/tmp/overwri1.$$;old=/tmp/overwri2.$$
+trap 'rm -f $new $old; exit 1' 1 2 15
+
+if "$@" > $new
+then
+	cp $file $old
+	trap '' 1 2 15
+	cp $new $file
+else
+	echo "overwrite: $1 failed. $file unchanged" 1>&2
+	exit 1
+fi
+rm -f $new $old
